@@ -18,7 +18,7 @@ A WPF desktop application for tracking stock portfolios using real-time data fro
 
 ## Screenshot
 
-(Add screenshot of the application here)
+![Stock Portfolio Tracker](AktieTracker.PNG)
 
 ## Future improvements
 
