@@ -1,0 +1,127 @@
+﻿<Window x:Class="AktieTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:AktieTracker.ViewModels"
+        xmlns:conv="clr-namespace:AktieTracker.Converters"
+        Title="Aktie Tracker" Height="600" Width="1000">
+
+    <Window.Resources>
+        <conv:ProfitColorConverter x:Key="ProfitColorConverter"/>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <DockPanel Margin="10">
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">         
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                <TextBlock Width="100" Text="Ticker"/>
+                <TextBlock Width="120" Margin="10,0,0,0" Text="Købspris"/>
+                <TextBlock Width="80" Margin="10,0,0,0" Text="Antal"/>
+            </StackPanel>  
+            
+            <StackPanel Orientation="Horizontal">
+                <TextBox Width="100"
+                 Text="{Binding NewTicker, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBox Width="120"
+                 Margin="10,0,0,0"
+                 Text="{Binding NewPurchasePrice}" />
+
+                <TextBox Width="80"
+                 Margin="10,0,0,0"
+                 Text="{Binding NewQuantity}" />
+
+                <Button Content="Tilføj aktie"
+                Margin="10,0,0,0"
+                Command="{Binding AddStockCommand}"/>
+
+                <Button Content="Opdater alle"
+                Margin="10,0,0,0"
+                Command="{Binding UpdateAllStocksCommand}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
+
+            <TextBlock Text="Samlet værdi:"
+               FontWeight="Bold"
+               Margin="0,0,10,0"/>
+
+            <TextBlock Text="{Binding TotalPortfolioValue, StringFormat={}{0:F2} USD}"
+               Margin="0,0,20,0"/>
+
+            <TextBlock Text="Samlet profit:"
+               FontWeight="Bold"
+               Margin="0,0,10,0"/>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding TotalPortfolioProfit, StringFormat={}{0:+0.00;-0.00;0.00}}"
+                   Foreground="{Binding TotalPortfolioProfit, Converter={StaticResource ProfitColorConverter}}"/>
+                
+                <TextBlock Text=" USD" Foreground="Black"/>
+            </StackPanel>
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding Stocks}" AutoGenerateColumns="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Ticker" Binding="{Binding Ticker}"/>
+                <DataGridTextColumn Header="Antal" Binding="{Binding Quantity}" />
+                <DataGridTextColumn Header="Købspris" Binding="{Binding PurchasePrice}"/>
+                <DataGridTextColumn Header="Aktuel kurs" Binding="{Binding CurrentPrice}"/>
+                <DataGridTextColumn Header="Profit" Binding="{Binding Profit, StringFormat={}{0:+0.00;-0.00;0.00}}">
+                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="Foreground"
+                    Value="{Binding Profit, Converter={StaticResource ProfitColorConverter}}"/></Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Profit %" Binding="{Binding ProfitPercent, StringFormat={}{0:F2}%}">
+                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="Foreground"
+                    Value="{Binding ProfitPercent, Converter={StaticResource ProfitColorConverter}}"/></Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Position værdi" Binding="{Binding PositionValue, StringFormat={}{0:F2} USD}"/>
+                <DataGridTemplateColumn Header="Position profit">
+                    <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding PositionProfit, StringFormat={}{0:+0.00;-0.00;0.00}}"
+                           Foreground="{Binding PositionProfit, Converter={StaticResource ProfitColorConverter}}"/>
+                                <TextBlock Text=" USD" Foreground="Black"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Sidst opdateret" Binding="{Binding LastUpdated}"/>              
+
+                <DataGridTemplateColumn Header="Handling">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Opdater Kurs" Margin="0,0,15,0"
+                                        Command="{Binding DataContext.UpdateStockCommand,
+                                    RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"/>
+                                
+                                <Button Content="Ret pris" Margin="0,0,15,0"
+                                        Command="{Binding DataContext.UpdatePurchasePriceCommand,
+                                    RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"/>
+
+                                <Button Content="Ret antal" Margin="0,0,15,0"
+                                        Command="{Binding DataContext.UpdateQuantityCommand,
+                                    RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"/>
+
+                                <Button Content="Slet" Command="{Binding DataContext.DeleteStockCommand,
+                                    RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>
